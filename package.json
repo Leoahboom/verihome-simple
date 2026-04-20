@@ -1,0 +1,13 @@
+{
+  "name": "verihome-simple",
+  "version": "1.0.0",
+  "description": "VeriHome - AI-Powered House Inspection Reports",
+  "main": "verihome-simple.html",
+  "scripts": {
+    "start": "serve .",
+    "dev": "serve ."
+  },
+  "keywords": ["house", "inspection", "ai", "property", "new zealand"],
+  "author": "VeriHome",
+  "license": "ISC"
+}
