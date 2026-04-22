@@ -1,3 +1,88 @@
 {
-  "version": 2
+  "version": 2,
+  "name": "propertywise-nz-legal",
+  "builds": [
+    {
+      "src": "propertywise-nz.html",
+      "use": "@vercel/static"
+    },
+    {
+      "src": "api/**/*.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/api/legal-consultation",
+      "dest": "/api/legal-consultation.js"
+    },
+    {
+      "src": "/api/legal-document-upload", 
+      "dest": "/api/legal-document-upload.js"
+    },
+    {
+      "src": "/api/legal-webhook",
+      "dest": "/api/legal-webhook.js"
+    },
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/",
+      "dest": "/propertywise-nz.html"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/propertywise-nz.html"
+    }
+  ],
+  "functions": {
+    "api/**/*.js": {
+      "maxDuration": 60,
+      "memory": 1024,
+      "regions": ["syd1"]
+    }
+  },
+  "env": {
+    "STRIPE_PUBLISHABLE_KEY": "@stripe_publishable_key",
+    "STRIPE_SECRET_KEY": "@stripe_secret_key", 
+    "STRIPE_WEBHOOK_SECRET": "@stripe_webhook_secret",
+    "SENDGRID_API_KEY": "@sendgrid_api_key",
+    "LEGAL_TEAM_EMAIL": "@legal_team_email",
+    "NODE_ENV": "@node_env"
+  },
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "https://propertywise.co.nz"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET, POST, OPTIONS"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "Content-Type, Authorization"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/home",
+      "destination": "/"
+    },
+    {
+      "source": "/legal",
+      "destination": "/#services"
+    }
+  ],
+  "regions": ["syd1"],
+  "github": {
+    "enabled": false
+  }
 }
