@@ -1,17 +1,33 @@
 {
-    "version": 2,
-    "outputDirectory": ".",
-    "routes": [
-          {
-                  "src": "/api/(.*)",
-                  "dest": "/api/$1"
-          },
-          {
-                  "handle": "filesystem"
-          },
-          {
-                  "src": "/(.*)",
-                  "dest": "/index.html"
-          }
-    ]
+  "version": 2,
+  "outputDirectory": ".",
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/privacy.html",
+      "dest": "/privacy.html"
+    },
+    {
+      "src": "/terms.html",
+      "dest": "/terms.html"
+    },
+    {
+      "src": "/disclaimer.html",
+      "dest": "/disclaimer.html"
+    },
+    {
+      "src": "/refund.html",
+      "dest": "/refund.html"
+    },
+    {
+      "handle": "filesystem"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
 }
