@@ -787,7 +787,7 @@
       btnText.textContent = on ? (text || 'Processing...') : '🔍 Analyse for Free';
     }
 
-    let msgTimer;
+    var msgTimer;
     function showMessage(text, type) {
       const el = document.getElementById('message');
       el.textContent = text; el.className = type; el.style.display = 'block';
