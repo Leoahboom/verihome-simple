@@ -8,27 +8,33 @@ export default async function handler(req, res) {
   try {
     const { amount, currency = 'nzd', packageType, metadata = {} } = req.body;
 
-    // Validate required fields
     if (!amount || !packageType) {
       return res.status(400).json({ error: 'Amount and package type are required' });
     }
 
-    // Package configurations
+    // Package configurations — prices in NZD cents
+    // Launch Offer pricing: Essential $69 (orig $129), Complete $199 (orig $249), Premium $259 (orig $319)
     const packages = {
       essential: {
-        name: 'Essential Legal Review',
-        description: 'Single document analysis with key risk identification',
-        features: ['Single document analysis', 'Key risk identification', 'Basic recommendations', '48-hour turnaround']
+        name: 'Essential Review',
+        description: 'AI analysis of one property document — S&P Agreement, LIM Report, or Building Inspection',
+        amount: 6900,       // $69 NZD launch price
+        originalAmount: 12900, // $129 NZD original price
+        features: ['Single document AI analysis', 'Full risk identification', 'NZ-specific recommendations', 'Negotiation points', '48-hour turnaround', 'PDF report']
       },
       complete: {
-        name: 'Complete Legal Analysis', 
-        description: 'Comprehensive analysis of all property documents',
-        features: ['All documents analysis', 'Comprehensive risk assessment', 'Strategic purchase advice', '24-hour turnaround']
+        name: 'Complete Analysis',
+        description: 'Comprehensive AI analysis of all your property documents with full strategic advice',
+        amount: 19900,      // $199 NZD launch price
+        originalAmount: 24900, // $249 NZD original price
+        features: ['All documents AI analysis', 'Full risk assessment', 'Strategic purchase advice', 'Detailed negotiation strategy', '24-hour turnaround', 'Due diligence checklist', 'Detailed PDF report']
       },
       premium: {
-        name: 'Premium Legal Consultation',
-        description: 'Full legal consultation with personal advisory call',
-        features: ['Everything in Complete', 'Priority 12-hour turnaround', '1-hour consultation call', '30-day support']
+        name: 'Premium Consultation',
+        description: 'Priority full analysis with follow-up Q&A and custom negotiation strategy',
+        amount: 25900,      // $259 NZD launch price
+        originalAmount: 31900, // $319 NZD original price
+        features: ['Everything in Complete', 'Priority 12-hour turnaround', 'Follow-up Q&A session', 'Custom negotiation strategy', 'Legal document templates', '30-day email support']
       }
     };
 
@@ -37,7 +43,13 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'Invalid package type' });
     }
 
-    // Create Stripe checkout session
+    // Use amount from request body (allows frontend to pass launch price)
+    // Validate it matches the expected launch price for security
+    const expectedAmount = selectedPackage.amount;
+    if (amount !== expectedAmount) {
+      return res.status(400).json({ error: 'Invalid amount for package' });
+    }
+
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       line_items: [
@@ -45,12 +57,13 @@ export default async function handler(req, res) {
           price_data: {
             currency: currency,
             product_data: {
-              name: `Verihome NZ - ${selectedPackage.name}`,
+              name: `Verihome NZ — ${selectedPackage.name}`,
               description: selectedPackage.description,
-              images: ['https://verihome.co.nz/logo.png'],
               metadata: {
-                service_type: 'legal_consultation',
+                service_type: 'property_document_analysis',
                 package_type: packageType,
+                original_price_nzd: String(selectedPackage.originalAmount / 100),
+                launch_price_nzd: String(selectedPackage.amount / 100),
               }
             },
             unit_amount: amount,
@@ -59,28 +72,26 @@ export default async function handler(req, res) {
         },
       ],
       mode: 'payment',
+      // Allow customers to enter promo codes at checkout
+      allow_promotion_codes: true,
       success_url: `${req.headers.origin}/?success=true&session_id={CHECKOUT_SESSION_ID}&package=${packageType}`,
       cancel_url: `${req.headers.origin}/?canceled=true`,
       metadata: {
         ...metadata,
-        service: 'legal_consultation',
+        service: 'property_document_analysis',
         package: packageType,
         domain: req.headers.origin,
       },
       customer_email: req.body.customer_email || undefined,
       billing_address_collection: 'required',
-      shipping_address_collection: {
-        allowed_countries: ['NZ'], // New Zealand only for legal services
-      },
       payment_intent_data: {
-        description: `Verihome NZ - ${selectedPackage.name}`,
+        description: `Verihome NZ — ${selectedPackage.name}`,
         metadata: {
           ...metadata,
-          service_type: 'legal_consultation',
+          service_type: 'property_document_analysis',
           package_type: packageType,
         },
       },
-      // Custom fields for legal service
       custom_fields: [
         {
           key: 'property_address',
@@ -94,35 +105,21 @@ export default async function handler(req, res) {
           type: 'text',
           optional: true,
         },
-        {
-          key: 'urgency',
-          label: { type: 'text', value: 'Urgency Level' },
-          type: 'dropdown',
-          dropdown: {
-            options: [
-              { label: 'Standard', value: 'standard' },
-              { label: 'Urgent (within 24 hours)', value: 'urgent' },
-              { label: 'Emergency (same day)', value: 'emergency' }
-            ]
-          },
-          optional: true,
-        }
       ],
-      // Legal service specific settings
       consent_collection: {
         terms_of_service: 'required',
-        privacy_policy: 'required',
       },
     });
 
-    res.status(200).json({ 
-      id: session.id, 
+    res.status(200).json({
+      id: session.id,
       url: session.url,
-      package: selectedPackage.name
+      package: selectedPackage.name,
+      amount: selectedPackage.amount,
     });
-    
+
   } catch (error) {
-    console.error('Stripe legal consultation error:', error);
+    console.error('Stripe checkout error:', error);
     res.status(500).json({ error: error.message });
   }
 }
