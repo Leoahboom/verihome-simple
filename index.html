@@ -497,21 +497,43 @@
     </div>
   </section>
 
+
+  <!-- LAUNCH OFFER BANNER -->
+  <div style="background:linear-gradient(135deg,#1a3c5e,#0f2840);color:white;text-align:center;padding:1rem 2rem;">
+    <div style="max-width:800px;margin:0 auto;display:flex;align-items:center;justify-content:center;gap:1.5rem;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span style="background:#2ecc71;color:white;padding:3px 10px;border-radius:20px;font-size:0.75rem;font-weight:700;text-transform:uppercase;letter-spacing:1px;">Launch Offer</span>
+        <span style="font-size:0.95rem;font-weight:600;">Save up to 46% — Limited time for early adopters</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px;font-size:0.85rem;opacity:0.85;flex-wrap:wrap;">
+        <span>🔒 Secure Stripe checkout</span>
+        <span style="margin:0 6px;opacity:0.4;">|</span>
+        <span>💰 Money-back guarantee</span>
+        <span style="margin:0 6px;opacity:0.4;">|</span>
+        <span>🇳🇿 NZ-specific analysis</span>
+      </div>
+    </div>
+  </div>
+
   <!-- PRICING -->
   <section class="section pricing-bg" id="pricing">
     <div class="section-inner">
       <div class="section-label">Pricing</div>
-      <h2 class="section-title">Get Your Full Analysis</h2>
-      <p class="section-sub">Pay only when you need the full report. Free preview always included with every upload.</p>
+      <h2 class="section-title">Get Your Full AI Analysis</h2>
+      <p class="section-sub">Free preview always included. Pay only when you want the complete report. Promo codes accepted at checkout.</p>
       <div class="pricing-grid">
         <div class="pricing-card">
           <h3>Essential Review</h3>
-          <div class="pricing-price"><span class="amount">$149</span> <span class="currency">NZD</span></div>
+          <div class="pricing-price">
+            <div style="font-size:0.85rem;color:#94a3b8;text-decoration:line-through;margin-bottom:2px;">Was $129 NZD</div>
+            <span class="amount">$69</span> <span class="currency">NZD</span>
+            <span style="display:inline-block;background:#dcfce7;color:#166534;font-size:0.72rem;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:6px;">Save $60</span>
+          </div>
           <ul class="pricing-features">
-            <li>Single document full analysis</li>
+            <li>Single document AI analysis</li>
             <li>All risk findings unlocked</li>
             <li>NZ-specific recommendations</li>
-            <li>Basic negotiation points</li>
+            <li>Negotiation points</li>
             <li>48-hour turnaround</li>
             <li>PDF report summary</li>
           </ul>
@@ -520,10 +542,14 @@
         <div class="pricing-card popular">
           <div class="popular-badge">⭐ Most Popular</div>
           <h3>Complete Analysis</h3>
-          <div class="pricing-price"><span class="amount">$299</span> <span class="currency">NZD</span></div>
+          <div class="pricing-price">
+            <div style="font-size:0.85rem;color:#94a3b8;text-decoration:line-through;margin-bottom:2px;">Was $249 NZD</div>
+            <span class="amount">$199</span> <span class="currency">NZD</span>
+            <span style="display:inline-block;background:#dcfce7;color:#166534;font-size:0.72rem;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:6px;">Save $50</span>
+          </div>
           <ul class="pricing-features">
-            <li>All documents analysis</li>
-            <li>Full AI risk assessment</li>
+            <li>All documents AI analysis</li>
+            <li>Full risk assessment</li>
             <li>Strategic purchase advice</li>
             <li>Detailed negotiation strategy</li>
             <li>24-hour turnaround</li>
@@ -534,7 +560,11 @@
         </div>
         <div class="pricing-card">
           <h3>Premium Consultation</h3>
-          <div class="pricing-price"><span class="amount">$499</span> <span class="currency">NZD</span></div>
+          <div class="pricing-price">
+            <div style="font-size:0.85rem;color:#94a3b8;text-decoration:line-through;margin-bottom:2px;">Was $319 NZD</div>
+            <span class="amount">$259</span> <span class="currency">NZD</span>
+            <span style="display:inline-block;background:#dcfce7;color:#166534;font-size:0.72rem;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:6px;">Save $60</span>
+          </div>
           <ul class="pricing-features">
             <li>Everything in Complete</li>
             <li>Priority 12-hour turnaround</li>
@@ -546,13 +576,38 @@
           <button class="pricing-btn pricing-btn-outline" onclick="handlePayment('premium')">Select Premium</button>
         </div>
       </div>
+
+      <!-- TRUST SIGNALS -->
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:1.25rem;margin-top:2rem;padding:1.75rem;background:white;border-radius:12px;border:1px solid #e2e8f0;">
+        <div style="text-align:center;">
+          <div style="font-size:1.75rem;margin-bottom:0.4rem;">🔒</div>
+          <div style="font-weight:700;color:#1e293b;font-size:0.875rem;">Secure Checkout</div>
+          <div style="color:#64748b;font-size:0.78rem;margin-top:2px;">256-bit SSL via Stripe</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:1.75rem;margin-bottom:0.4rem;">💰</div>
+          <div style="font-weight:700;color:#1e293b;font-size:0.875rem;">Money-Back Guarantee</div>
+          <div style="color:#64748b;font-size:0.78rem;margin-top:2px;">Not satisfied? Full refund</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:1.75rem;margin-bottom:0.4rem;">🇳🇿</div>
+          <div style="font-weight:700;color:#1e293b;font-size:0.875rem;">NZ Law Context</div>
+          <div style="color:#64748b;font-size:0.78rem;margin-top:2px;">REINZ, RMA, NZ Building Code</div>
+        </div>
+        <div style="text-align:center;">
+          <div style="font-size:1.75rem;margin-bottom:0.4rem;">🏷️</div>
+          <div style="font-weight:700;color:#1e293b;font-size:0.875rem;">Promo Codes</div>
+          <div style="color:#64748b;font-size:0.78rem;margin-top:2px;">Enter at Stripe checkout</div>
+        </div>
+      </div>
+
       <div class="disclaimer">
-        <p><strong>Important Disclaimer:</strong> Verihome NZ provides AI-powered analysis for informational purposes only. Our service does not constitute formal legal advice under the Lawyers and Conveyancers Act 2006. For complex transactions or when legal certainty is required, consult a qualified NZ conveyancing solicitor. We recommend using our analysis as a starting point for discussions with your legal counsel.</p>
+        <p><strong>Important Disclaimer:</strong> Verihome NZ provides AI-powered analysis for informational purposes only. This does not constitute formal legal advice under the Lawyers and Conveyancers Act 2006. For complex transactions, consult a qualified NZ conveyancing solicitor. <a href="/refund.html" style="color:#92400e;">Refund Policy</a> · <a href="/terms.html" style="color:#92400e;">Terms of Service</a></p>
       </div>
     </div>
   </section>
 
-  <!-- FULL REPORT (shown after payment) -->
+    <!-- FULL REPORT (shown after payment) -->
   <div id="full-report">
     <div class="report-header">
       <div class="section-label" style="text-align:center">Full AI Report</div>
@@ -587,9 +642,9 @@
       </div>
       <div class="footer-col">
         <h4>Legal</h4>
-        <a href="#">Terms of Service</a>
-        <a href="#">Privacy Policy</a>
-        <a href="#">Disclaimer</a>
+        <a href="/terms.html">Terms of Service</a>
+        <a href="/privacy.html">Privacy Policy</a>
+        <a href="/disclaimer.html">Disclaimer</a>
       </div>
     </div>
     <div class="footer-bottom">
@@ -702,7 +757,7 @@
     async function handlePayment(packageType) {
       if (!uploadedFiles.length) { showMessage('Please upload your documents first.', 'error'); document.getElementById('upload').scrollIntoView({behavior:'smooth'}); return; }
       selectedPackage = packageType;
-      const prices = { essential: 14900, complete: 29900, premium: 49900 };
+      const prices = { essential: 6900, complete: 19900, premium: 25900 };
       setLoading(true, 'Setting up payment...');
       try {
         const res = await fetch('/api/legal-consultation', {
