@@ -95,13 +95,13 @@ export default async function handler(req, res) {
       custom_fields: [
         {
           key: 'property_address',
-          label: { type: 'text', value: 'Property Address' },
+          label: { type: 'custom', custom: 'Property Address' },
           type: 'text',
           optional: false,
         },
         {
           key: 'settlement_date',
-          label: { type: 'text', value: 'Proposed Settlement Date' },
+          label: { type: 'custom', custom: 'Proposed Settlement Date' },
           type: 'text',
           optional: true,
         },
