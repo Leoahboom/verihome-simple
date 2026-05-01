@@ -658,7 +658,7 @@
     let selectedDocType = 'other';
     let previewSessionId = null;
     let selectedPackage = null;
-    const stripe = Stripe('pk_live_51TJsPxCjLsOPVd8akaIHCJbHrS7T3w1nSlHmUVdzto9Nr02HAfd3nWbmHxD3YexcKJjqgavB92Awo48BjgB6BusQ00U81lb1uH');
+    let stripe; try { stripe = Stripe('pk_live_51TJsPxCjLsOPVd8akaIHCJbHrS7T3w1nSlHmUVdzto9Nr02HAfd3nWbmHxD3YexcKJjqgavB92Awo48BjgB6BusQ00U81lb1uH'); } catch(e) { console.warn('Stripe.js not loaded', e); }
 
     // =================== DOC TYPE ===================
     function selectDocType(el) {
