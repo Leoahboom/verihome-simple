@@ -80,7 +80,7 @@ async function handleLegalConsultationPayment(session) {
     stripe_payment_intent:  session.payment_intent,
     customer_email:         customerEmail,
     customer_name:          customerName,
-    amount_cents:           amount,
+    amount:                 amount,
     currency:               currency,
     package_type:           packageType,
     property_address:       propertyAddress,
@@ -148,7 +148,7 @@ async function sendClientConfirmationEmail(email, name, record) {
   const { error } = await resend.emails.send({
     from: 'Verihome NZ <support@verihome.co.nz>',
     to:   email,
-    subject: `✅ Your Verihome Legal Consultation is Confirmed – ${packageLabel}`,
+    subject: `Your Verihome Legal Consultation is Confirmed - ${packageLabel}`,
     html: `
       <!DOCTYPE html>
       <html>
@@ -172,7 +172,7 @@ async function sendClientConfirmationEmail(email, name, record) {
       </head>
       <body>
         <div class="header">
-          <h1>⚖️ Verihome NZ</h1>
+          <h1>Verihome NZ</h1>
           <h2>Legal Consultation Confirmed</h2>
         </div>
         <div class="content">
@@ -180,10 +180,10 @@ async function sendClientConfirmationEmail(email, name, record) {
           <p>Thank you for choosing Verihome NZ. Your payment has been confirmed and our legal team has been notified.</p>
 
           <div class="info-box">
-            <h4>📋 Service Details</h4>
+            <h4>Service Details</h4>
             <ul>
               <li><strong>Package:</strong> ${packageLabel}</li>
-              <li><strong>Amount Paid:</strong> $${(record.amount_cents / 100).toFixed(2)} ${record.currency.toUpperCase()}</li>
+              <li><strong>Amount Paid:</strong> $${(record.amount / 100).toFixed(2)} ${record.currency.toUpperCase()}</li>
               <li><strong>Property Address:</strong> ${record.property_address || 'Not provided'}</li>
               <li><strong>Settlement Date:</strong> ${record.settlement_date || 'Not specified'}</li>
               <li><strong>Priority Level:</strong> ${record.urgency}</li>
@@ -193,7 +193,7 @@ async function sendClientConfirmationEmail(email, name, record) {
           </div>
 
           <div class="steps">
-            <h4>📄 Next Steps</h4>
+            <h4>Next Steps</h4>
             <ol>
               <li>Our legal team will review your uploaded documents</li>
               <li>We'll conduct a comprehensive analysis based on your package</li>
@@ -203,7 +203,7 @@ async function sendClientConfirmationEmail(email, name, record) {
           </div>
 
           <div class="notice">
-            <strong>⚠️ Legal Notice:</strong> This service provides AI-assisted legal analysis for informational purposes. 
+            <strong>Legal Notice:</strong> This service provides AI-assisted legal analysis for informational purposes.
             For complex matters, we recommend consulting a qualified New Zealand solicitor.
           </div>
 
@@ -230,7 +230,7 @@ async function notifyLegalTeam(record) {
   const { error } = await resend.emails.send({
     from: 'Verihome System <support@verihome.co.nz>',
     to:   'support@verihome.co.nz',
-    subject: `🆕 New ${record.package_type.toUpperCase()} Consultation – ${record.urgency.toUpperCase()} – ${record.customer_name}`,
+    subject: `New ${record.package_type.toUpperCase()} Consultation - ${record.urgency.toUpperCase()} - ${record.customer_name}`,
     html: `
       <h2>New Legal Consultation Order</h2>
       <table style="border-collapse:collapse;width:100%">
@@ -241,7 +241,7 @@ async function notifyLegalTeam(record) {
         <tr><td style="padding:8px;border:1px solid #ddd"><strong>Urgency</strong></td><td style="padding:8px;border:1px solid #ddd">${record.urgency}</td></tr>
         <tr><td style="padding:8px;border:1px solid #ddd"><strong>Assigned To</strong></td><td style="padding:8px;border:1px solid #ddd">${record.assigned_lawyer}</td></tr>
         <tr><td style="padding:8px;border:1px solid #ddd"><strong>Due By</strong></td><td style="padding:8px;border:1px solid #ddd">${new Date(record.expected_completion_at).toLocaleString('en-NZ')}</td></tr>
-        <tr><td style="padding:8px;border:1px solid #ddd"><strong>Amount</strong></td><td style="padding:8px;border:1px solid #ddd">$${(record.amount_cents / 100).toFixed(2)} ${record.currency.toUpperCase()}</td></tr>
+        <tr><td style="padding:8px;border:1px solid #ddd"><strong>Amount</strong></td><td style="padding:8px;border:1px solid #ddd">$${(record.amount / 100).toFixed(2)} ${record.currency.toUpperCase()}</td></tr>
         <tr><td style="padding:8px;border:1px solid #ddd"><strong>Session ID</strong></td><td style="padding:8px;border:1px solid #ddd">${record.stripe_session_id}</td></tr>
       </table>
     `,
