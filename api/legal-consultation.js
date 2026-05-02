@@ -74,7 +74,7 @@ export default async function handler(req, res) {
       mode: 'payment',
       // Allow customers to enter promo codes at checkout
       allow_promotion_codes: true,
-      success_url: `${req.headers.origin}/?success=true&session_id={CHECKOUT_SESSION_ID}&package=${packageType}`,
+            success_url: `${req.headers.origin}/success.html?package=${packageType}&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${req.headers.origin}/?canceled=true`,
       metadata: {
         ...metadata,
