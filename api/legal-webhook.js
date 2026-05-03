@@ -26,9 +26,10 @@ function getRawBody(req) {
               req.on('error', reject);
       });
 }
-async function handler(req, res) {
+module.exports = async (req, res) => {
     if (req.method !== 'POST') {
-          return res.status(405).json({ error: 'Method not allowed' });
+        res.setHeader('Allow', 'POST');
+        return res.status(405).end('Method Not Allowed');
     }
 
   const sig = req.headers['stripe-signature'];
@@ -534,7 +535,6 @@ function assignLawyer(packageType) {
     return lawyers[packageType] || 'Legal Team';
 }
 
-module.exports = handler;
 module.exports.config = {
     api: { bodyParser: false },
 };
