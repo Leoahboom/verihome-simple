@@ -17,6 +17,15 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 // Initialize OpenAI
 const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
+// Helper: read raw body buffer (required for Stripe signature verification)
+function getRawBody(req) {
+      return new Promise((resolve, reject) => {
+              const chunks = [];
+              req.on('data', (chunk) => chunks.push(chunk));
+              req.on('end', () => resolve(Buffer.concat(chunks)));
+              req.on('error', reject);
+      });
+}
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
           return res.status(405).json({ error: 'Method not allowed' });
@@ -26,8 +35,9 @@ export default async function handler(req, res) {
     const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
   let event;
+      const rawBody = await getRawBody(req);
     try {
-          event = stripe.webhooks.constructEvent(req.body, sig, endpointSecret);
+                  event = stripe.webhooks.constructEvent(rawBody, sig, endpointSecret);
     } catch (err) {
           console.error('Webhook signature verification failed:', err.message);
           return res.status(400).json({ error: 'Webhook signature verification failed' });
