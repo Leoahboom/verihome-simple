@@ -26,6 +26,10 @@ function getRawBody(req) {
               req.on('error', reject);
       });
 }
+module.exports.config = {
+    api: { bodyParser: false },
+};
+
 module.exports = async (req, res) => {
     if (req.method !== 'POST') {
         res.setHeader('Allow', 'POST');
@@ -534,7 +538,3 @@ function assignLawyer(packageType) {
     };
     return lawyers[packageType] || 'Legal Team';
 }
-
-module.exports.config = {
-    api: { bodyParser: false },
-};
