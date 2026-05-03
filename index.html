@@ -658,6 +658,8 @@
     let uploadedFiles = [];
     let selectedDocType = 'other';
     let previewSessionId = null;
+    let storedFileKeys   = [];     
+    let previewDocType   = 'other';
     let selectedPackage = null;
     let stripe; try { stripe = Stripe('pk_live_51TJsPxCjLsOPVd8akaIHCJbHrS7T3w1nSlHmUVdzto9Nr02HAfd3nWbmHxD3YexcKJjqgavB92Awo48BjgB6BusQ00U81lb1uH'); } catch(e) { console.warn('Stripe.js not loaded', e); }
 
@@ -721,6 +723,8 @@
         if (data.error) throw new Error(data.error);
 
         previewSessionId = data.sessionId;
+        storedFileKeys   = data.storedFileKeys || [];
+        previewDocType   = selectedDocType;           
         renderPreview(data);
         document.getElementById('preview-result').style.display = 'block';
         document.getElementById('preview-result').scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -766,7 +770,7 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             amount: prices[packageType], currency: 'nzd', packageType,
-            metadata: { sessionId: previewSessionId || '', fileCount: uploadedFiles.length }
+            metadata: { sessionId: previewSessionId || '', fileCount: uploadedFiles.length, file_keys: JSON.stringify(storedFileKeys),  doc_type: previewDocType}
           })
         });
         const session = await res.json();
