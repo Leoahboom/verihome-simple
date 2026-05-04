@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Payment Confirmed — Verihome NZ</title>
+  <meta name="description" content="Your Verihome NZ property document analysis is confirmed. We'll send your report by email.">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --primary: #1a3c5e;
+      --primary-dark: #0f2840;
+      --accent: #2ecc71;
+      --accent-dark: #27ae60;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-600: #475569;
+      --gray-800: #1e293b;
+      --white: #ffffff;
+      --shadow: 0 4px 20px rgba(0,0,0,0.10);
+      --shadow-lg: 0 20px 60px rgba(0,0,0,0.15);
+      --radius: 14px;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 60%, #1e5799 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem;
+    }
+    .card {
+      background: var(--white);
+      border-radius: 20px;
+      padding: 3rem 2.5rem;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: var(--shadow-lg);
+      text-align: center;
+    }
+    .checkmark {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 1.75rem;
+      font-size: 2.5rem;
+      box-shadow: 0 8px 24px rgba(46,204,113,0.35);
+      animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    @keyframes popIn {
+      from { transform: scale(0); opacity: 0; }
+      to   { transform: scale(1); opacity: 1; }
+    }
+    h1 {
+      color: var(--primary);
+      font-size: 1.9rem;
+      font-weight: 800;
+      margin-bottom: 0.75rem;
+      line-height: 1.2;
+    }
+    .subtitle {
+      color: var(--gray-600);
+      font-size: 1rem;
+      line-height: 1.7;
+      margin-bottom: 2rem;
+    }
+    .info-box {
+      background: var(--gray-50);
+      border: 1px solid var(--gray-200);
+      border-left: 4px solid var(--primary);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      text-align: left;
+    }
+    .info-box h3 {
+      color: var(--primary);
+      font-size: 0.9rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 1rem;
+    }
+    .info-row {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--gray-200);
+      font-size: 0.9rem;
+    }
+    .info-row:last-child { border-bottom: none; }
+    .info-icon { font-size: 1.1rem; flex-shrink: 0; margin-top: 1px; }
+    .info-text { color: var(--gray-800); }
+    .info-text strong { color: var(--primary); }
+    .timeline {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      margin-bottom: 2rem;
+      text-align: left;
+    }
+    .timeline-item {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      position: relative;
+    }
+    .timeline-item:not(:last-child)::after {
+      content: '';
+      position: absolute;
+      left: 15px;
+      top: 32px;
+      bottom: -8px;
+      width: 2px;
+      background: var(--gray-200);
+    }
+    .timeline-dot {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.95rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+    .timeline-dot.done { background: rgba(46,204,113,0.15); }
+    .timeline-dot.active { background: rgba(26,60,94,0.12); }
+    .timeline-dot.pending { background: var(--gray-100); }
+    .timeline-body { padding-bottom: 20px; }
+    .timeline-title { font-weight: 700; font-size: 0.9rem; color: var(--gray-800); }
+    .timeline-desc { font-size: 0.825rem; color: var(--gray-600); margin-top: 2px; line-height: 1.5; }
+    .timeline-tag {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      margin-left: 6px;
+      vertical-align: middle;
+    }
+    .tag-done { background: rgba(46,204,113,0.15); color: #16a34a; }
+    .tag-active { background: rgba(26,60,94,0.12); color: var(--primary); }
+    .turnaround {
+      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+      color: white;
+      border-radius: var(--radius);
+      padding: 1.25rem 1.5rem;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      text-align: left;
+    }
+    .turnaround-icon { font-size: 2rem; flex-shrink: 0; }
+    .turnaround-title { font-weight: 700; font-size: 1rem; margin-bottom: 2px; }
+    .turnaround-desc { font-size: 0.85rem; opacity: 0.85; line-height: 1.5; }
+    .btn-home {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--accent);
+      color: white;
+      padding: 13px 28px;
+      border-radius: 10px;
+      font-weight: 700;
+      font-size: 0.95rem;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+    .btn-home:hover { background: var(--accent-dark); transform: translateY(-1px); }
+    .support-note {
+      margin-top: 1.5rem;
+      font-size: 0.825rem;
+      color: var(--gray-600);
+    }
+    .support-note a { color: var(--primary); font-weight: 600; text-decoration: none; }
+    .support-note a:hover { text-decoration: underline; }
+    .logo {
+      position: fixed;
+      top: 1.25rem;
+      left: 1.75rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+    .logo-icon {
+      width: 34px; height: 34px;
+      background: var(--accent);
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+    }
+    .logo-name { color: white; font-weight: 700; font-size: 1rem; }
+    .logo-name span { color: var(--accent); }
+    @media (max-width: 480px) {
+      .card { padding: 2rem 1.5rem; }
+      h1 { font-size: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <a href="/" class="logo">
+    <div class="logo-icon">🏠</div>
+    <span class="logo-name">Veri<span>home</span> NZ</span>
+  </a>
+
+  <div class="card">
+    <div class="checkmark">✓</div>
+
+    <h1>Payment Confirmed!</h1>
+    <p class="subtitle">
+      Thank you for choosing Verihome NZ. Your order has been received and our team has been notified.
+      <strong id="email-line"></strong>
+    </p>
+
+    <div class="info-box">
+      <h3>📋 Order Summary</h3>
+      <div class="info-row">
+        <span class="info-icon">📦</span>
+        <span class="info-text"><strong id="package-name">Complete Analysis</strong></span>
+      </div>
+      <div class="info-row">
+        <span class="info-icon">📧</span>
+        <span class="info-text">Confirmation email sent to your inbox</span>
+      </div>
+      <div class="info-row">
+        <span class="info-icon">🔐</span>
+        <span class="info-text">Order ID: <strong id="session-id" style="font-size:0.8rem;word-break:break-all;"></strong></span>
+      </div>
+    </div>
+
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="timeline-dot done">✅</div>
+        <div class="timeline-body">
+          <div class="timeline-title">Payment received <span class="timeline-tag tag-done">Done</span></div>
+          <div class="timeline-desc">Your payment was processed successfully via Stripe.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot done">✅</div>
+        <div class="timeline-body">
+          <div class="timeline-title">Confirmation email sent <span class="timeline-tag tag-done">Done</span></div>
+          <div class="timeline-desc">Check your inbox (and spam folder) for your order confirmation.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot active">⚙️</div>
+        <div class="timeline-body">
+          <div class="timeline-title">Document analysis in progress <span class="timeline-tag tag-active">In Progress</span></div>
+          <div class="timeline-desc">Our AI and legal team are reviewing your uploaded documents.</div>
+        </div>
+      </div>
+      <div class="timeline-item">
+        <div class="timeline-dot pending">📩</div>
+        <div class="timeline-body">
+          <div class="timeline-title">Full report delivered</div>
+          <div class="timeline-desc">Your detailed analysis report will be emailed to you.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="turnaround" id="turnaround-box">
+      <div class="turnaround-icon">⏱️</div>
+      <div>
+        <div class="turnaround-title" id="turnaround-title">Report within 24 hours</div>
+        <div class="turnaround-desc">We'll email your full analysis report directly to you. Keep an eye on your inbox — and check your spam folder just in case.</div>
+      </div>
+    </div>
+
+    <a href="/" class="btn-home">← Back to Verihome NZ</a>
+
+    <p class="support-note">
+      Questions? Email us at <a href="mailto:support@verihome.co.nz">support@verihome.co.nz</a>
+    </p>
+  </div>
+
+  <script>
+    const params = new URLSearchParams(window.location.search);
+    const pkg    = params.get('package') || 'complete';
+    const sid    = params.get('session_id') || '';
+
+    // Package display names & turnaround
+    const pkgInfo = {
+      essential: { name: 'Essential Review',       hours: '48 hours' },
+      complete:  { name: 'Complete Analysis',      hours: '24 hours' },
+      premium:   { name: 'Premium Consultation',   hours: '12 hours' },
+    };
+    const info = pkgInfo[pkg] || pkgInfo.complete;
+
+    document.getElementById('package-name').textContent   = info.name;
+    document.getElementById('turnaround-title').textContent = 'Report within ' + info.hours;
+    document.getElementById('session-id').textContent     = sid ? sid.replace('cs_', 'cs_...').slice(0, 30) + '...' : '—';
+  </script>
+</body>
+</html>
