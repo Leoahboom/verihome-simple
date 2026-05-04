@@ -17,24 +17,24 @@ async function handler(req, res) {
     const packages = {
       essential: {
         name: 'Essential Review',
-        description: 'AI analysis of one property document — S&P Agreement, LIM Report, or Building Inspection',
-        amount: 6900,       // $69 NZD launch price
-        originalAmount: 12900, // $129 NZD original price
-        features: ['Single document AI analysis', 'Full risk identification', 'NZ-specific recommendations', 'Negotiation points', '48-hour turnaround', 'PDF report']
+        description: 'AI-powered risk report covering all your property documents with NZ-specific recommendations',
+        amount: 2522,       // $25.22 NZD excl. GST (~$29 incl. GST)
+        originalAmount: 4261, // ~$49 incl. GST original
+        features: ['All documents analysed', 'High/Medium/Low risk findings', 'NZ legal context & recommendations', 'Pre-unconditional checklist', '48-hour turnaround']
       },
       complete: {
         name: 'Complete Analysis',
-        description: 'Comprehensive AI analysis of all your property documents with full strategic advice',
-        amount: 19900,      // $199 NZD launch price
-        originalAmount: 24900, // $249 NZD original price
-        features: ['All documents AI analysis', 'Full risk assessment', 'Strategic purchase advice', 'Detailed negotiation strategy', '24-hour turnaround', 'Due diligence checklist', 'Detailed PDF report']
+        description: 'Deep-dive analysis with negotiation strategy, due diligence checklist and NZ legislation references',
+        amount: 7739,       // $77.39 NZD excl. GST (~$89 incl. GST)
+        originalAmount: 12957, // ~$149 incl. GST original
+        features: ['Everything in Essential', 'Detailed analysis with cost estimates', 'Negotiation leverage points', 'NZ legislation references', 'Due diligence checklist (10+ items)', '24-hour turnaround']
       },
       premium: {
-        name: 'Premium Consultation',
-        description: 'Priority full analysis with follow-up Q&A and custom negotiation strategy',
-        amount: 25900,      // $259 NZD launch price
-        originalAmount: 31900, // $319 NZD original price
-        features: ['Everything in Complete', 'Priority 12-hour turnaround', 'Follow-up Q&A session', 'Custom negotiation strategy', 'Legal document templates', '30-day email support']
+        name: 'Premium Report',
+        description: 'Formal legal-style report with statute citations, negotiation script and contract conditions to add',
+        amount: 12957,      // $129.57 NZD excl. GST (~$149 incl. GST)
+        originalAmount: 21652, // ~$249 incl. GST original
+        features: ['Everything in Complete', 'Specific NZ statute citations', 'Full negotiation script', 'Contract conditions to add', 'Solicitor referral advice', 'Priority 12-hour turnaround']
       }
     };
 
