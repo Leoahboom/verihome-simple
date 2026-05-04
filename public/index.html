@@ -526,17 +526,16 @@
         <div class="pricing-card">
           <h3>Essential Review</h3>
           <div class="pricing-price">
-            <div style="font-size:0.85rem;color:#94a3b8;text-decoration:line-through;margin-bottom:2px;">Was $129 NZD</div>
-            <span class="amount">$69</span> <span class="currency">NZD</span>
-            <span style="display:inline-block;background:#dcfce7;color:#166534;font-size:0.72rem;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:6px;">Save $60</span>
+            <div style="font-size:0.85rem;color:#94a3b8;text-decoration:line-through;margin-bottom:2px;">Was $49 NZD incl. GST</div>
+            <span class="amount">$29</span> <span class="currency">NZD incl. GST</span>
+            <span style="display:inline-block;background:#dcfce7;color:#166534;font-size:0.72rem;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:6px;">Save $20</span>
           </div>
           <ul class="pricing-features">
-            <li>Single document AI analysis</li>
-            <li>All risk findings unlocked</li>
-            <li>NZ-specific recommendations</li>
-            <li>Negotiation points</li>
+            <li>All documents analysed</li>
+            <li>High / Medium / Low risk findings</li>
+            <li>NZ legal context &amp; recommendations</li>
+            <li>Pre-unconditional checklist</li>
             <li>48-hour turnaround</li>
-            <li>PDF report summary</li>
           </ul>
           <button class="pricing-btn pricing-btn-outline" onclick="handlePayment('essential')">Select Essential</button>
         </div>
@@ -544,26 +543,25 @@
           <div class="popular-badge">⭐ Most Popular</div>
           <h3>Complete Analysis</h3>
           <div class="pricing-price">
-            <div style="font-size:0.85rem;color:#94a3b8;text-decoration:line-through;margin-bottom:2px;">Was $249 NZD</div>
-            <span class="amount">$199</span> <span class="currency">NZD</span>
+            <div style="font-size:0.85rem;color:#94a3b8;text-decoration:line-through;margin-bottom:2px;">Was $149 NZD incl. GST</div>
+            <span class="amount">$89</span> <span class="currency">NZD</span>
             <span style="display:inline-block;background:#dcfce7;color:#166534;font-size:0.72rem;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:6px;">Save $50</span>
           </div>
           <ul class="pricing-features">
-            <li>All documents AI analysis</li>
-            <li>Full risk assessment</li>
-            <li>Strategic purchase advice</li>
-            <li>Detailed negotiation strategy</li>
+            <li>Everything in Essential</li>
+            <li>Detailed analysis with cost estimates</li>
+            <li>Negotiation leverage points</li>
+            <li>NZ legislation references</li>
+            <li>Due diligence checklist (10+ items)</li>
             <li>24-hour turnaround</li>
-            <li>Due diligence checklist</li>
-            <li>Detailed PDF report</li>
           </ul>
           <button class="pricing-btn pricing-btn-primary" onclick="handlePayment('complete')">Select Complete</button>
         </div>
         <div class="pricing-card">
-          <h3>Premium Consultation</h3>
+          <h3>Premium Report</h3>
           <div class="pricing-price">
-            <div style="font-size:0.85rem;color:#94a3b8;text-decoration:line-through;margin-bottom:2px;">Was $319 NZD</div>
-            <span class="amount">$259</span> <span class="currency">NZD</span>
+            <div style="font-size:0.85rem;color:#94a3b8;text-decoration:line-through;margin-bottom:2px;">Was $249 NZD incl. GST</div>
+            <span class="amount">$149</span> <span class="currency">NZD</span>
             <span style="display:inline-block;background:#dcfce7;color:#166534;font-size:0.72rem;font-weight:700;padding:2px 8px;border-radius:20px;margin-left:6px;">Save $60</span>
           </div>
           <ul class="pricing-features">
@@ -762,7 +760,7 @@
     async function handlePayment(packageType) {
       if (!uploadedFiles.length) { showMessage('Please upload your documents first.', 'error'); document.getElementById('upload').scrollIntoView({behavior:'smooth'}); return; }
       selectedPackage = packageType;
-      const prices = { essential: 6900, complete: 19900, premium: 25900 };
+      const prices = { essential: 2522, complete: 7739, premium: 12957 };
       setLoading(true, 'Setting up payment...');
       try {
         const res = await fetch('/api/legal-consultation', {
