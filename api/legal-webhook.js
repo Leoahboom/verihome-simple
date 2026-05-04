@@ -217,52 +217,100 @@ async function generateAndSendReport({ customerEmail, customerName, packageType,
         return;
   }
 
-  // Layer 3: OpenAI Analysis
+  // Layer 3: OpenAI Analysis - tiered by package
   const packageLabel = { essential: 'Essential', complete: 'Complete', premium: 'Premium' }[packageType] || packageType;
 
-  const systemPrompt = `You are a senior New Zealand property lawyer conducting a detailed analysis of property documents for a homebuyer. 
-  You specialize in NZ property law including the Property Law Act 2007, Unit Titles Act 2010, Building Act 2004, and Resource Management Act 1991.
-  Write clearly for a non-lawyer buyer. Be specific, actionable, and flag all risks with recommendations.
-  Format your response as structured HTML for an email report.`;
+  // Tier config
+  const tierConfig = {
+    essential: {
+      model: 'gpt-4o-mini',
+      max_tokens: 1500,
+      systemPrompt: `You are a New Zealand property law analyst. Analyse property documents for a homebuyer and produce a clear, professional risk report. Reference NZ legislation where relevant (Property Law Act 2007, Building Act 2004, Unit Titles Act 2010, Resource Management Act 1991). Write for a non-lawyer buyer. Be concise and actionable.`,
+      userPrompt: (findings, fileTexts) => `Analyse these NZ property documents and produce an Essential Risk Report.
 
-  const userPrompt = `Conduct a comprehensive ${packageLabel} analysis of the following NZ property document(s) for a homebuyer.
+RULE ENGINE PRE-SCAN:
+${findings.flatMap(f => f.ruleFindings).slice(0, 20).map((f, i) => `${i+1}. [${f.risk}] ${f.category}: ${f.message}`).join('\n')}
 
-  DOCUMENT SUMMARY:
-  ${allFindings.map(f => `- ${f.fileName} (${f.detectedDocType.toUpperCase()}, ${f.wordCount} words) &mdash; ${f.ruleFindings.length} rule-engine findings`).join('\n')}
+DOCUMENT EXCERPTS:
+${findings.flatMap(f => f.flaggedContexts).slice(0, 8).map((c, i) => `[Excerpt ${i+1}]: ${c}`).join('\n\n')}
 
-  RULE ENGINE FINDINGS (pre-identified risks):
-  ${allFindings.flatMap(f => f.ruleFindings).slice(0, 20).map((f, i) => `${i + 1}. [${f.risk}] ${f.category}: ${f.message}`).join('\n')}
+Produce a professional HTML report with these sections:
+1. EXECUTIVE SUMMARY (2-3 sentences: key risks, should buyer proceed?)
+2. HIGH RISK FINDINGS (each with: issue description, why it matters, one clear action)
+3. MEDIUM RISK FINDINGS (each with: issue description, recommended action)
+4. LOW RISK FINDINGS (brief list)
+5. PRE-UNCONDITIONAL CHECKLIST (5 must-do actions before signing)
 
-  DOCUMENT EXCERPTS FOR CONTEXT:
-  ${allFindings.flatMap(f => f.flaggedContexts).slice(0, 10).map((c, i) => `[Excerpt ${i+1}]: ${c}`).join('\n\n')}
+Format: Use <h3> for section headers, <ul><li> for lists. Colour-code: HIGH = red, MEDIUM = orange, LOW = green. Keep language plain and direct.`
+    },
+    complete: {
+      model: 'gpt-4o-mini',
+      max_tokens: 3000,
+      systemPrompt: `You are a senior New Zealand property lawyer producing a detailed analysis for a homebuyer client. You have deep knowledge of NZ property law including the Property Law Act 2007, Unit Titles Act 2010, Building Act 2004, Resource Management Act 1991, and REINZ standards. Reference specific legislation by name. Provide detailed, actionable advice.`,
+      userPrompt: (findings, fileTexts) => `Conduct a Complete Analysis of these NZ property documents.
 
-  Please provide:
-  1. EXECUTIVE SUMMARY (2-3 sentences &mdash; should buyer proceed?)
-  2. HIGH RISK FINDINGS (detailed analysis of each critical issue)
-  3. MEDIUM RISK FINDINGS (important but manageable issues)
-  4. LOW RISK FINDINGS (minor items to be aware of)
-  5. RECOMMENDED ACTIONS BEFORE GOING UNCONDITIONAL (numbered list)
-  6. NEGOTIATION LEVERAGE POINTS (if any)
-  7. LEGAL DISCLAIMER
+RULE ENGINE PRE-SCAN:
+${findings.flatMap(f => f.ruleFindings).slice(0, 20).map((f, i) => `${i+1}. [${f.risk}] ${f.category}: ${f.message}`).join('\n')}
 
-  Format each section with clear HTML headers (<h3>), use <ul>/<li> for lists, use color coding: red for HIGH, orange for MEDIUM, green for LOW risks.`;
+DOCUMENT EXCERPTS:
+${findings.flatMap(f => f.flaggedContexts).slice(0, 10).map((c, i) => `[Excerpt ${i+1}]: ${c}`).join('\n\n')}
+
+Produce a comprehensive HTML report with:
+1. EXECUTIVE SUMMARY (overall risk assessment, clear purchase recommendation)
+2. HIGH RISK FINDINGS (detailed analysis, NZ legal context, specific action required, estimated cost/impact)
+3. MEDIUM RISK FINDINGS (full analysis, legal context, action steps)
+4. LOW RISK FINDINGS (analysis and monitoring recommendations)
+5. NEGOTIATION LEVERAGE POINTS (specific issues the buyer can use to negotiate price reduction or remediation, with suggested dollar amounts where possible)
+6. DUE DILIGENCE CHECKLIST (10+ specific actions before going unconditional, in priority order)
+7. RELEVANT NZ LEGISLATION (list which laws apply and why)
+
+Format: Use <h3> headers, <ul><li> lists. Colour-code risks. Reference NZ legislation by name throughout.`
+    },
+    premium: {
+      model: 'gpt-4o',
+      max_tokens: 6000,
+      systemPrompt: `You are a senior NZ property conveyancing solicitor producing a formal legal analysis report. You have expert knowledge of NZ property law: Property Law Act 2007, Unit Titles Act 2010 (especially ss.144-148 pre-contract disclosure), Building Act 2004 (especially ss.36, 92, 364A regarding code compliance), Resource Management Act 1991, Weathertight Homes Resolution Services Act 2006, and standard REINZ S&P Agreement clauses. Cite specific sections. Write in formal legal report style but remain accessible to a non-lawyer buyer.`,
+      userPrompt: (findings, fileTexts) => `Produce a Premium Legal Analysis Report for this NZ property purchase.
+
+RULE ENGINE PRE-SCAN:
+${findings.flatMap(f => f.ruleFindings).slice(0, 20).map((f, i) => `${i+1}. [${f.risk}] ${f.category}: ${f.message}`).join('\n')}
+
+DOCUMENT EXCERPTS:
+${findings.flatMap(f => f.flaggedContexts).slice(0, 12).map((c, i) => `[Excerpt ${i+1}]: ${c}`).join('\n\n')}
+
+Produce a formal legal-style HTML report with:
+1. EXECUTIVE SUMMARY AND PURCHASE RECOMMENDATION (clear verdict: Proceed / Proceed with Conditions / Do Not Proceed — with reasons)
+2. HIGH RISK FINDINGS (formal legal analysis, cite specific NZ statute sections, vendor obligations, buyer remedies, cost estimates)
+3. MEDIUM RISK FINDINGS (full legal analysis with statute references)
+4. LOW RISK FINDINGS (legal context and monitoring)
+5. NEGOTIATION STRATEGY (specific leverage points with suggested price reduction amounts, conditions to add to contract, remediation requests — written as instructions to buyer)
+6. FULL NEGOTIATION SCRIPT (exact wording the buyer can use when negotiating with the vendor or agent)
+7. LEGAL CONDITIONS TO ADD TO CONTRACT (specific clauses the buyer should request before going unconditional)
+8. PRE-UNCONDITIONAL DUE DILIGENCE CHECKLIST (priority-ordered, 15+ items)
+9. WHEN TO INVOLVE A SOLICITOR (specific issues that require professional legal advice)
+10. APPLICABLE NZ LEGISLATION (full list with relevant section references)
+
+Format: Formal legal report style. Use <h3> headers with section numbers. Colour-code all risk levels. Cite statutes throughout as e.g. "s.36 Building Act 2004".`
+    }
+  };
+
+  const tier = tierConfig[packageType] || tierConfig.complete;
 
   const aiResponse = await openai.chat.completions.create({
-        model: 'gpt-4o-mini',
-        messages: [
-          { role: 'system', content: systemPrompt },
-          { role: 'user', content: userPrompt },
-              ],
-        max_tokens: 3000,
-        temperature: 0.3,
+    model: tier.model,
+    messages: [
+      { role: 'system', content: tier.systemPrompt },
+      { role: 'user', content: tier.userPrompt(allFindings, fileTexts) },
+    ],
+    max_tokens: tier.max_tokens,
+    temperature: 0.3,
   });
 
-  const reportHtml = aiResponse.choices[0].message.content;
+  let reportHtml = aiResponse.choices[0].message.content;
   // Strip markdown code block wrapper if AI returned ```html ... ```
   reportHtml = reportHtml.replace(/^```html[\s\S]*?\n/, '').replace(/\n?```\s*$/, '').trim();
 
-  // Send full report email
-  await sendFullReportEmail(customerEmail, customerName, packageType, record, reportHtml, allFindings);
+    await sendFullReportEmail(customerEmail, customerName, packageType, record, reportHtml, allFindings);
 
   // Update order status in Supabase
   await supabase
