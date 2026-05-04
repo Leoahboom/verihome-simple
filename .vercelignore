@@ -1,3 +1,1 @@
-# Prevent api/ JS files from being served as static assets
-# Vercel Functions in /api are automatically handled as serverless functions
-api/
+
