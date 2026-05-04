@@ -78,7 +78,7 @@ module.exports = async (req, res) => {
   }
 }
 
-// âââ Main Payment Handler ââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// --- Main Payment Handler ------------------------------------------------------
 async function handleLegalConsultationPayment(session) {
     console.log('Processing payment for session:', session.id);
 
@@ -143,14 +143,14 @@ async function handleLegalConsultationPayment(session) {
                 });
         } catch (err) {
                 console.error('Report generation failed:', err.message);
-                // Don't fail the whole webhook â order is already saved, confirmation sent
+                // Don't fail the whole webhook &mdash; order is already saved, confirmation sent
         }
   } else {
-        console.warn('No file_keys in metadata â cannot generate report for session:', session.id);
+        console.warn('No file_keys in metadata &mdash; cannot generate report for session:', session.id);
   }
 }
 
-// âââ AI Report Generation ââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// --- AI Report Generation ------------------------------------------------------
 async function generateAndSendReport({ customerEmail, customerName, packageType, docType, storedFileKeys, record, sessionId }) {
     console.log(`Generating report for ${customerEmail}, ${storedFileKeys.length} file(s)`);
 
@@ -228,7 +228,7 @@ async function generateAndSendReport({ customerEmail, customerName, packageType,
   const userPrompt = `Conduct a comprehensive ${packageLabel} analysis of the following NZ property document(s) for a homebuyer.
 
   DOCUMENT SUMMARY:
-  ${allFindings.map(f => `- ${f.fileName} (${f.detectedDocType.toUpperCase()}, ${f.wordCount} words) â ${f.ruleFindings.length} rule-engine findings`).join('\n')}
+  ${allFindings.map(f => `- ${f.fileName} (${f.detectedDocType.toUpperCase()}, ${f.wordCount} words) &mdash; ${f.ruleFindings.length} rule-engine findings`).join('\n')}
 
   RULE ENGINE FINDINGS (pre-identified risks):
   ${allFindings.flatMap(f => f.ruleFindings).slice(0, 20).map((f, i) => `${i + 1}. [${f.risk}] ${f.category}: ${f.message}`).join('\n')}
@@ -237,7 +237,7 @@ async function generateAndSendReport({ customerEmail, customerName, packageType,
   ${allFindings.flatMap(f => f.flaggedContexts).slice(0, 10).map((c, i) => `[Excerpt ${i+1}]: ${c}`).join('\n\n')}
 
   Please provide:
-  1. EXECUTIVE SUMMARY (2-3 sentences â should buyer proceed?)
+  1. EXECUTIVE SUMMARY (2-3 sentences &mdash; should buyer proceed?)
   2. HIGH RISK FINDINGS (detailed analysis of each critical issue)
   3. MEDIUM RISK FINDINGS (important but manageable issues)
   4. LOW RISK FINDINGS (minor items to be aware of)
@@ -273,7 +273,7 @@ async function generateAndSendReport({ customerEmail, customerName, packageType,
   console.log('Report generated and sent to:', customerEmail);
 }
 
-// âââ Supabase ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// --- Supabase ------------------------------------------------------------------
 async function saveOrderToSupabase(record) {
   const { data, error } = await supabase
     .from('orders')
@@ -304,7 +304,7 @@ async function updatePaymentStatus(paymentIntentId, status) {
   }
 }
 
-// âââ Resend Emails âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// --- Resend Emails -------------------------------------------------------------
 async function sendClientConfirmationEmail(email, name, record) {
     const packageLabel = {
           essential: 'Essential Review ($69 NZD)',
@@ -320,7 +320,7 @@ async function sendClientConfirmationEmail(email, name, record) {
   const { error } = await resend.emails.send({
         from: 'Verihome NZ <support@verihome.co.nz>',
         to: email,
-        subject: `Your Verihome Report is Being Prepared â ${packageLabel}`,
+        subject: `Your Verihome Report is Being Prepared - ${packageLabel}`,
         html: `
         <!DOCTYPE html><html><head><meta charset="utf-8"><style>
         body{font-family:Arial,sans-serif;line-height:1.6;color:#333;margin:0;padding:0}
@@ -336,7 +336,7 @@ async function sendClientConfirmationEmail(email, name, record) {
         .notice{background:#fff8e1;padding:16px;border-left:4px solid #ffc107;border-radius:4px;font-size:14px}
         .footer{background:#f8f9fa;padding:20px;text-align:center;font-size:13px;color:#666}
         </style></head><body>
-        <div class="header"><h1 style="margin:0">Verihome NZ</h1><h2 style="margin:8px 0 0;font-weight:normal;opacity:0.9">Payment Confirmed â Report In Progress</h2></div>
+        <div class="header"><h1 style="margin:0">Verihome NZ</h1><h2 style="margin:8px 0 0;font-weight:normal;opacity:0.9">Payment Confirmed &mdash; Report In Progress</h2></div>
         <div class="content">
         <p>Dear <strong>${name || 'Valued Customer'}</strong>,</p>
         <p>Thank you for choosing Verihome NZ. Your payment has been received and our AI analysis engine is now processing your documents.</p>
@@ -347,9 +347,9 @@ async function sendClientConfirmationEmail(email, name, record) {
         <li><strong>Expected Report Delivery:</strong> ${completionDate}</li>
         </ul></div>
         <div class="timeline"><h4>What Happens Next</h4>
-        <div class="step done"><div class="step-num">â</div><div><strong>Payment Confirmed</strong> â Your order has been received</div></div>
-        <div class="step active"><div class="step-num">2</div><div><strong>AI Analysis In Progress</strong> â Documents are being analysed by our NZ property law engine</div></div>
-        <div class="step pending"><div class="step-num">3</div><div><strong>Report Delivery</strong> â Full analysis will be emailed to you shortly</div></div>
+        <div class="step done"><div class="step-num">&#10003;</div><div><strong>Payment Confirmed</strong> &mdash; Your order has been received</div></div>
+        <div class="step active"><div class="step-num">2</div><div><strong>AI Analysis In Progress</strong> &mdash; Documents are being analysed by our NZ property law engine</div></div>
+        <div class="step pending"><div class="step-num">3</div><div><strong>Report Delivery</strong> &mdash; Full analysis will be emailed to you shortly</div></div>
         </div>
         <div class="notice"><strong>Note:</strong> Your full report will arrive in a separate email. Please check your spam folder if you don't see it within the expected timeframe.</div>
         <p style="margin-top:24px">Questions? Contact us at <a href="mailto:support@verihome.co.nz">support@verihome.co.nz</a></p>
@@ -378,7 +378,7 @@ async function sendFullReportEmail(email, name, packageType, record, reportHtml,
   const { error } = await resend.emails.send({
         from: 'Verihome NZ <support@verihome.co.nz>',
         to: email,
-        subject: `Your Verihome Property Report is Ready â ${packageLabel}`,
+        subject: `Your Verihome Property Report is Ready - ${packageLabel}`,
         html: `
         <!DOCTYPE html><html><head><meta charset="utf-8"><style>
         body{font-family:Arial,sans-serif;line-height:1.6;color:#333;margin:0;padding:0}
@@ -393,7 +393,7 @@ async function sendFullReportEmail(email, name, packageType, record, reportHtml,
         </style></head><body>
         <div class="header">
         <h1 style="margin:0">Verihome NZ</h1>
-        <h2 style="margin:8px 0 0;font-weight:normal;opacity:0.9">${packageLabel} â Property Analysis Report</h2>
+        <h2 style="margin:8px 0 0;font-weight:normal;opacity:0.9">${packageLabel} &mdash; Property Analysis Report</h2>
         </div>
         <div class="content">
         <p>Dear <strong>${name || 'Valued Customer'}</strong>,</p>
@@ -428,7 +428,7 @@ async function notifyLegalTeam(record) {
     const { error } = await resend.emails.send({
           from: 'Verihome System <support@verihome.co.nz>',
           to: 'support@verihome.co.nz',
-          subject: `New ${record.package_type.toUpperCase()} Order â ${record.customer_name || record.customer_email}`,
+          subject: `New ${record.package_type.toUpperCase()} Order - ${record.customer_name || record.customer_email}`,
           html: `
           <h2>New Legal Consultation Order</h2>
           <table style="border-collapse:collapse;width:100%">
@@ -448,47 +448,47 @@ async function notifyLegalTeam(record) {
     else console.log('Legal team notified');
 }
 
-// âââ NZ Rule Engine (Layer 1) ââââââââââââââââââââââââââââââââââââââââââââââââââ
+// --- NZ Rule Engine (Layer 1) --------------------------------------------------
 const NZ_RISK_RULES = {
     spa: [
-      { pattern: /as\s+is\s+where\s+is/gi, risk: 'HIGH', category: 'Contract Terms', message: '"As is where is" clause â seller disclaims all responsibility for property condition.' },
-      { pattern: /cash\s+unconditional/gi, risk: 'HIGH', category: 'Contract Terms', message: 'Cash unconditional offer â no finance or due diligence protection for buyer.' },
-      { pattern: /leasehold/gi, risk: 'HIGH', category: 'Title', message: 'Leasehold title â ground rent reviews can significantly increase future holding costs.' },
-      { pattern: /meth(amphetamine)?\s+(contamin|test|residue)/gi, risk: 'HIGH', category: 'Contamination', message: 'Methamphetamine contamination reference â obtain independent meth test before proceeding.' },
-      { pattern: /body\s+corporate/gi, risk: 'MEDIUM', category: 'Body Corporate', message: 'Body corporate property â obtain levy statements and meeting minutes before going unconditional.' },
-      { pattern: /unit\s+title/gi, risk: 'MEDIUM', category: 'Title', message: 'Unit title â pre-contract disclosure statement required under Unit Titles Act 2010.' },
-      { pattern: /cross[\s-]?lease/gi, risk: 'MEDIUM', category: 'Title', message: 'Cross-lease title â verify flats plan matches current structures; illegal alterations are common.' },
-      { pattern: /penalty\s+(interest|clause)/gi, risk: 'MEDIUM', category: 'Financial', message: 'Penalty clause â late settlement may incur significant additional charges.' },
-      { pattern: /subject\s+to\s+finance/gi, risk: 'LOW', category: 'Conditions', message: 'Finance condition â standard protection, ensure bank approval timeline is realistic.' },
-      { pattern: /chattels?/gi, risk: 'LOW', category: 'Chattels', message: 'Chattels referenced â verify all listed items are present and in working order at settlement.' },
-      { pattern: /vacant\s+possession/gi, risk: 'LOW', category: 'Possession', message: 'Vacant possession required â confirm tenancy end date if property is currently tenanted.' },
+      { pattern: /as\s+is\s+where\s+is/gi, risk: 'HIGH', category: 'Contract Terms', message: '"As is where is" clause &mdash; seller disclaims all responsibility for property condition.' },
+      { pattern: /cash\s+unconditional/gi, risk: 'HIGH', category: 'Contract Terms', message: 'Cash unconditional offer &mdash; no finance or due diligence protection for buyer.' },
+      { pattern: /leasehold/gi, risk: 'HIGH', category: 'Title', message: 'Leasehold title &mdash; ground rent reviews can significantly increase future holding costs.' },
+      { pattern: /meth(amphetamine)?\s+(contamin|test|residue)/gi, risk: 'HIGH', category: 'Contamination', message: 'Methamphetamine contamination reference &mdash; obtain independent meth test before proceeding.' },
+      { pattern: /body\s+corporate/gi, risk: 'MEDIUM', category: 'Body Corporate', message: 'Body corporate property &mdash; obtain levy statements and meeting minutes before going unconditional.' },
+      { pattern: /unit\s+title/gi, risk: 'MEDIUM', category: 'Title', message: 'Unit title &mdash; pre-contract disclosure statement required under Unit Titles Act 2010.' },
+      { pattern: /cross[\s-]?lease/gi, risk: 'MEDIUM', category: 'Title', message: 'Cross-lease title &mdash; verify flats plan matches current structures; illegal alterations are common.' },
+      { pattern: /penalty\s+(interest|clause)/gi, risk: 'MEDIUM', category: 'Financial', message: 'Penalty clause &mdash; late settlement may incur significant additional charges.' },
+      { pattern: /subject\s+to\s+finance/gi, risk: 'LOW', category: 'Conditions', message: 'Finance condition &mdash; standard protection, ensure bank approval timeline is realistic.' },
+      { pattern: /chattels?/gi, risk: 'LOW', category: 'Chattels', message: 'Chattels referenced &mdash; verify all listed items are present and in working order at settlement.' },
+      { pattern: /vacant\s+possession/gi, risk: 'LOW', category: 'Possession', message: 'Vacant possession required &mdash; confirm tenancy end date if property is currently tenanted.' },
         ],
     lim: [
-      { pattern: /outstanding\s+(building\s+)?consent/gi, risk: 'HIGH', category: 'Building Consent', message: 'Outstanding building consent â structures may be illegal. Demand code compliance certificate.' },
-      { pattern: /no\s+code\s+compliance/gi, risk: 'HIGH', category: 'Building Consent', message: 'No code compliance certificate â council has not signed off on completed building work.' },
-      { pattern: /notice\s+to\s+(fix|rectify|remedy)/gi, risk: 'HIGH', category: 'Council Notice', message: 'Notice to fix issued by council â legal repair obligation that transfers to purchaser.' },
-      { pattern: /flood(ing|plain|prone)?/gi, risk: 'HIGH', category: 'Environmental', message: 'Flood risk noted in LIM â check council flood maps and obtain insurance quotes before committing.' },
-      { pattern: /liquefaction/gi, risk: 'HIGH', category: 'Environmental', message: 'Liquefaction risk â common in Christchurch, Wellington coastal areas. Verify EQC claims history.' },
-      { pattern: /contaminated\s+(land|site|soil)/gi, risk: 'HIGH', category: 'Environmental', message: 'Land contamination recorded on LIM â remediation costs can be very substantial.' },
-      { pattern: /asbestos/gi, risk: 'HIGH', category: 'Hazardous Materials', message: 'Asbestos referenced â if pre-1990 building, obtain asbestos survey before purchase.' },
-      { pattern: /heritage\s+(order|designation|listing)/gi, risk: 'MEDIUM', category: 'Heritage', message: 'Heritage designation â limits alterations significantly, may affect resale value.' },
-      { pattern: /designation/gi, risk: 'MEDIUM', category: 'Planning', message: 'Land designation found â local or central government may have acquisition rights.' },
-      { pattern: /onsite\s+(wastewater|septic)/gi, risk: 'MEDIUM', category: 'Services', message: 'Onsite wastewater system â verify compliance with regional council rules; ongoing maintenance costs.' },
-      { pattern: /resource\s+consent/gi, risk: 'LOW', category: 'Planning', message: 'Resource consent on record â check ongoing consent conditions and obligations.' },
+      { pattern: /outstanding\s+(building\s+)?consent/gi, risk: 'HIGH', category: 'Building Consent', message: 'Outstanding building consent &mdash; structures may be illegal. Demand code compliance certificate.' },
+      { pattern: /no\s+code\s+compliance/gi, risk: 'HIGH', category: 'Building Consent', message: 'No code compliance certificate &mdash; council has not signed off on completed building work.' },
+      { pattern: /notice\s+to\s+(fix|rectify|remedy)/gi, risk: 'HIGH', category: 'Council Notice', message: 'Notice to fix issued by council &mdash; legal repair obligation that transfers to purchaser.' },
+      { pattern: /flood(ing|plain|prone)?/gi, risk: 'HIGH', category: 'Environmental', message: 'Flood risk noted in LIM &mdash; check council flood maps and obtain insurance quotes before committing.' },
+      { pattern: /liquefaction/gi, risk: 'HIGH', category: 'Environmental', message: 'Liquefaction risk &mdash; common in Christchurch, Wellington coastal areas. Verify EQC claims history.' },
+      { pattern: /contaminated\s+(land|site|soil)/gi, risk: 'HIGH', category: 'Environmental', message: 'Land contamination recorded on LIM &mdash; remediation costs can be very substantial.' },
+      { pattern: /asbestos/gi, risk: 'HIGH', category: 'Hazardous Materials', message: 'Asbestos referenced &mdash; if pre-1990 building, obtain asbestos survey before purchase.' },
+      { pattern: /heritage\s+(order|designation|listing)/gi, risk: 'MEDIUM', category: 'Heritage', message: 'Heritage designation &mdash; limits alterations significantly, may affect resale value.' },
+      { pattern: /designation/gi, risk: 'MEDIUM', category: 'Planning', message: 'Land designation found &mdash; local or central government may have acquisition rights.' },
+      { pattern: /onsite\s+(wastewater|septic)/gi, risk: 'MEDIUM', category: 'Services', message: 'Onsite wastewater system &mdash; verify compliance with regional council rules; ongoing maintenance costs.' },
+      { pattern: /resource\s+consent/gi, risk: 'LOW', category: 'Planning', message: 'Resource consent on record &mdash; check ongoing consent conditions and obligations.' },
         ],
     building: [
-      { pattern: /moisture\s+(meter|reading|level|damage|intrusion)/gi, risk: 'HIGH', category: 'Moisture', message: 'Moisture issues detected â may indicate weathertightness failure. Get specialist report urgently.' },
-      { pattern: /weathertight(ness)?(\s+risk|\s+failure|\s+issue)?/gi, risk: 'HIGH', category: 'Weathertightness', message: 'Weathertightness risk flagged â NZ leaky building remediation can exceed $200,000 NZD.' },
-      { pattern: /monolithic\s+cladding/gi, risk: 'HIGH', category: 'Weathertightness', message: 'Monolithic cladding system â high weathertightness risk, common in 1990s-2000s NZ builds.' },
-      { pattern: /structural\s+(concern|issue|damage|defect|movement)/gi, risk: 'HIGH', category: 'Structure', message: 'Structural concerns â engage a structural engineer before going unconditional.' },
-      { pattern: /foundation\s+(crack|subsidence|settlement|movement)/gi, risk: 'HIGH', category: 'Structure', message: 'Foundation issues â can be very costly to remediate; obtain engineering assessment.' },
-      { pattern: /urgent\s+(repair|attention|remediation)/gi, risk: 'HIGH', category: 'Urgent Works', message: 'Urgent repairs flagged â use these to negotiate purchase price reduction.' },
-      { pattern: /earthquake\s+(damage|prone|risk)/gi, risk: 'HIGH', category: 'Earthquake', message: 'Earthquake damage or risk â check council earthquake-prone building register and EQC claims.' },
-      { pattern: /\$[\d,]+\s*(to|-)\s*\$[\d,]+/g, risk: 'MEDIUM', category: 'Cost Estimates', message: 'Repair cost estimates found â total all figures for price negotiation leverage.' },
-      { pattern: /electrical\s+(fault|issue|concern|non.compliant)/gi, risk: 'MEDIUM', category: 'Electrical', message: 'Electrical issues â non-compliant wiring is a safety concern and may affect insurance.' },
-      { pattern: /plumbing\s+(leak|issue|concern|age)/gi, risk: 'MEDIUM', category: 'Plumbing', message: 'Plumbing concerns â aged or leaking pipes can be expensive to replace throughout a house.' },
-      { pattern: /re.roofing\s+recommended|roof\s+(end|near)\s+of\s+life/gi, risk: 'MEDIUM', category: 'Roofing', message: 'Roof replacement recommended â budget $15,000-$45,000 NZD depending on size and material.' },
-      { pattern: /uninspected\s+area/gi, risk: 'MEDIUM', category: 'Inspection Limitation', message: 'Areas not inspected â hidden risks remain. Consider invasive investigation before committing.' },
+      { pattern: /moisture\s+(meter|reading|level|damage|intrusion)/gi, risk: 'HIGH', category: 'Moisture', message: 'Moisture issues detected &mdash; may indicate weathertightness failure. Get specialist report urgently.' },
+      { pattern: /weathertight(ness)?(\s+risk|\s+failure|\s+issue)?/gi, risk: 'HIGH', category: 'Weathertightness', message: 'Weathertightness risk flagged &mdash; NZ leaky building remediation can exceed $200,000 NZD.' },
+      { pattern: /monolithic\s+cladding/gi, risk: 'HIGH', category: 'Weathertightness', message: 'Monolithic cladding system &mdash; high weathertightness risk, common in 1990s-2000s NZ builds.' },
+      { pattern: /structural\s+(concern|issue|damage|defect|movement)/gi, risk: 'HIGH', category: 'Structure', message: 'Structural concerns &mdash; engage a structural engineer before going unconditional.' },
+      { pattern: /foundation\s+(crack|subsidence|settlement|movement)/gi, risk: 'HIGH', category: 'Structure', message: 'Foundation issues &mdash; can be very costly to remediate; obtain engineering assessment.' },
+      { pattern: /urgent\s+(repair|attention|remediation)/gi, risk: 'HIGH', category: 'Urgent Works', message: 'Urgent repairs flagged &mdash; use these to negotiate purchase price reduction.' },
+      { pattern: /earthquake\s+(damage|prone|risk)/gi, risk: 'HIGH', category: 'Earthquake', message: 'Earthquake damage or risk &mdash; check council earthquake-prone building register and EQC claims.' },
+      { pattern: /\$[\d,]+\s*(to|-)\s*\$[\d,]+/g, risk: 'MEDIUM', category: 'Cost Estimates', message: 'Repair cost estimates found &mdash; total all figures for price negotiation leverage.' },
+      { pattern: /electrical\s+(fault|issue|concern|non.compliant)/gi, risk: 'MEDIUM', category: 'Electrical', message: 'Electrical issues &mdash; non-compliant wiring is a safety concern and may affect insurance.' },
+      { pattern: /plumbing\s+(leak|issue|concern|age)/gi, risk: 'MEDIUM', category: 'Plumbing', message: 'Plumbing concerns &mdash; aged or leaking pipes can be expensive to replace throughout a house.' },
+      { pattern: /re.roofing\s+recommended|roof\s+(end|near)\s+of\s+life/gi, risk: 'MEDIUM', category: 'Roofing', message: 'Roof replacement recommended &mdash; budget $15,000-$45,000 NZD depending on size and material.' },
+      { pattern: /uninspected\s+area/gi, risk: 'MEDIUM', category: 'Inspection Limitation', message: 'Areas not inspected &mdash; hidden risks remain. Consider invasive investigation before committing.' },
         ],
 };
 
@@ -528,7 +528,7 @@ function detectDocType(text, declared) {
     return 'other';
 }
 
-// âââ Helpers âââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
+// --- Helpers -------------------------------------------------------------------
 function calculateCompletionTime(packageType, urgency) {
     const baseHours = { essential: 48, complete: 24, premium: 12 };
     const multiplier = { emergency: 0.25, urgent: 0.5, standard: 1 };
