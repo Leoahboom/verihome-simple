@@ -273,13 +273,17 @@ async function generateAndSendReport({ customerEmail, customerName, packageType,
 
 // âââ Supabase ââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 async function saveOrderToSupabase(record) {
-    const { data, error } = await supabase
-      .from('orders')
-      .insert([record]);
-
+  const { data, error } = await supabase
+    .from('orders')
+    .insert([record]);
   if (error) {
-        console.error('Supabase insert error:', error);
-        throw new Error(`Failed to save order: ${error.message}`);
+    if (error.code === '23505') {
+      // Duplicate key - order already processed (idempotent)
+      console.log('Order already exists (duplicate), skipping insert:', record.stripe_session_id);
+      return null;
+    }
+    console.error('Supabase insert error:', error);
+    throw new Error(`Failed to save order: ${error.message}`);
   }
     console.log('Order saved to Supabase');
     return data;
