@@ -32,7 +32,7 @@
 
     /* NAV */
     nav {
-      position: fixed; top: 0; width: 100%; z-index: 1000;
+      position: fixed; top: 40px; width: 100%; z-index: 1000;
       background: rgba(26,60,94,0.96); backdrop-filter: blur(12px);
       padding: 0 2rem; height: 64px; display: flex; align-items: center;
       justify-content: space-between; border-bottom: 1px solid rgba(255,255,255,0.1);
@@ -51,7 +51,7 @@
 
     /* HERO */
     .hero {
-      min-height: 100vh; padding-top: 64px; position: relative; overflow: hidden;
+      min-height: 100vh; padding-top: 104px; position: relative; overflow: hidden;
       background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, #1e5799 100%);
       display: flex; align-items: center;
     }
@@ -311,7 +311,7 @@
   <!-- NAV -->
   <nav>
     <a href="#" class="nav-brand">
-      <div class="nav-logo">🏠</div>
+
       <span class="nav-name">Veri<span>home</span> NZ</span>
     </a>
     <div class="nav-links">
@@ -321,6 +321,21 @@
       <a href="#upload" class="nav-cta">Free Preview ↑</a>
     </div>
   </nav>
+  <!-- LAUNCH OFFER BANNER (fixed top) -->
+  <div id="launch-banner" style="position:fixed;top:0;left:0;width:100%;z-index:1100;background:linear-gradient(90deg,#92400e,#b45309,#92400e);color:white;text-align:center;padding:0 1rem;height:40px;display:flex;align-items:center;justify-content:center;gap:1.5rem;font-size:0.8rem;white-space:nowrap;overflow:hidden;">
+    <span style="background:#fbbf24;color:#78350f;padding:2px 10px;border-radius:20px;font-size:0.72rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;flex-shrink:0;">&#128293; Launch Offer</span>
+    <span style="font-weight:600;flex-shrink:0;">Save up to $100 &mdash; Ends 30 Jun 2025</span>
+    <span style="display:flex;align-items:center;gap:0.5rem;font-variant-numeric:tabular-nums;flex-shrink:0;">
+      <span id="cd-days" style="font-weight:800;">--</span><span style="opacity:0.6;font-size:0.72rem;">d</span>
+      <span style="opacity:0.4;margin:0 2px;">:</span>
+      <span id="cd-hours" style="font-weight:800;">--</span><span style="opacity:0.6;font-size:0.72rem;">h</span>
+      <span style="opacity:0.4;margin:0 2px;">:</span>
+      <span id="cd-mins" style="font-weight:800;">--</span><span style="opacity:0.6;font-size:0.72rem;">m</span>
+      <span style="opacity:0.4;margin:0 2px;">:</span>
+      <span id="cd-secs" style="font-weight:800;">--</span><span style="opacity:0.6;font-size:0.72rem;">s</span>
+    </span>
+    <a href="#pricing" style="background:rgba(255,255,255,0.2);color:white;padding:3px 12px;border-radius:20px;font-size:0.75rem;font-weight:700;text-decoration:none;flex-shrink:0;">View Offer &rarr;</a>
+  </div>
 
   <!-- HERO -->
   <section class="hero">
@@ -497,46 +512,6 @@
       </div>
     </div>
   </section>
-
-
-  <!-- LAUNCH OFFER BANNER -->
-  <div style="background:linear-gradient(135deg,#92400e,#78350f);color:white;text-align:center;padding:1.5rem 2rem;" id="launch-banner">
-    <div style="max-width:900px;margin:0 auto;">
-      <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:0.75rem;flex-wrap:wrap;">
-        <span style="background:#fbbf24;color:#78350f;padding:4px 14px;border-radius:20px;font-size:0.78rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;">&#128293; Launch Offer</span>
-        <span style="font-size:1.05rem;font-weight:700;">Save up to $100 &mdash; Offer ends 30 June 2025</span>
-      </div>
-      <div style="display:flex;align-items:center;justify-content:center;gap:2rem;flex-wrap:wrap;margin-bottom:0.75rem;">
-        <div style="text-align:center;min-width:56px;">
-          <div style="font-size:2.2rem;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;" id="cd-days">--</div>
-          <div style="font-size:0.68rem;opacity:0.75;text-transform:uppercase;letter-spacing:1px;margin-top:2px;">Days</div>
-        </div>
-        <div style="font-size:1.8rem;font-weight:200;opacity:0.5;margin-bottom:14px;">:</div>
-        <div style="text-align:center;min-width:56px;">
-          <div style="font-size:2.2rem;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;" id="cd-hours">--</div>
-          <div style="font-size:0.68rem;opacity:0.75;text-transform:uppercase;letter-spacing:1px;margin-top:2px;">Hours</div>
-        </div>
-        <div style="font-size:1.8rem;font-weight:200;opacity:0.5;margin-bottom:14px;">:</div>
-        <div style="text-align:center;min-width:56px;">
-          <div style="font-size:2.2rem;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;" id="cd-mins">--</div>
-          <div style="font-size:0.68rem;opacity:0.75;text-transform:uppercase;letter-spacing:1px;margin-top:2px;">Minutes</div>
-        </div>
-        <div style="font-size:1.8rem;font-weight:200;opacity:0.5;margin-bottom:14px;">:</div>
-        <div style="text-align:center;min-width:56px;">
-          <div style="font-size:2.2rem;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;" id="cd-secs">--</div>
-          <div style="font-size:0.68rem;opacity:0.75;text-transform:uppercase;letter-spacing:1px;margin-top:2px;">Seconds</div>
-        </div>
-      </div>
-      <div style="display:flex;align-items:center;justify-content:center;gap:6px;font-size:0.82rem;opacity:0.85;flex-wrap:wrap;">
-        <span>&#128274; Secure Stripe checkout</span>
-        <span style="margin:0 6px;opacity:0.4;">|</span>
-        <span>&#128176; 7-day money-back guarantee</span>
-        <span style="margin:0 6px;opacity:0.4;">|</span>
-        <span>&#127475;&#127487; NZ-specific analysis</span>
-      </div>
-    </div>
-  </div>
-
   <!-- PRICING -->
   <section class="section pricing-bg" id="pricing">
     <div class="section-inner">
