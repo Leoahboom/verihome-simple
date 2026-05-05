@@ -17,7 +17,6 @@ module.exports = async (req, res) => {
   if (!token || token !== process.env.REVIEW_SECRET) {
     return res.status(401).send('<h2>Unauthorised</h2><p>Invalid or missing review token.</p>');
   }
-
   if (!session_id) {
     return res.status(400).send('<h2>Bad Request</h2><p>Missing session_id.</p>');
   }
@@ -36,7 +35,8 @@ module.exports = async (req, res) => {
 
   if (order.status === 'report_sent') {
     return res.status(200).send([
-      '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Already Sent</title></head><body style="font-family:Arial;padding:40px;max-width:600px;margin:0 auto;">',
+      '<!DOCTYPE html><html><head><meta charset="utf-8"><title>Already Sent</title></head>',
+      '<body style="font-family:Arial;padding:40px;max-width:600px;margin:0 auto;">',
       '<h2 style="color:#27ae60;">Already Sent</h2>',
       '<p>This report has already been sent to <strong>' + order.customer_email + '</strong>.</p>',
       '<p style="color:#666;font-size:0.9rem;">Session: ' + session_id + '</p>',
@@ -48,28 +48,39 @@ module.exports = async (req, res) => {
     return res.status(400).send('<h2>Error</h2><p>No report HTML found for this order. Report may not have been generated yet.</p>');
   }
 
-  // Build allFindings stub for email (we just need counts from order metadata)
-  const allFindings = [];
+  const pkgLabel = {
+    essential: 'Essential Review',
+    complete: 'Complete Analysis',
+    premium: 'Premium Report'
+  }[order.package_type] || order.package_type;
 
-  // Send the report to the client
-  const pkgLabel = { essential: 'Essential Review', complete: 'Complete Analysis', premium: 'Premium Report' }[order.package_type] || order.package_type;
+  // Parse risk counts from AI report HTML
+  const { highRisks, medRisks, lowRisks, total } = parseRiskCountsFromHtml(order.report_html);
 
   const clientHtml = [
     '<!DOCTYPE html><html><head><meta charset="utf-8"><style>',
     'body{font-family:Arial,sans-serif;line-height:1.6;color:#333;margin:0;padding:0}',
     '.hdr{background:#1a3c5e;color:white;padding:24px;text-align:center}',
+    '.b{display:inline-block;padding:4px 10px;border-radius:12px;font-size:13px;font-weight:bold;margin:2px}',
+    '.hi{background:#ffebee;color:#c62828}.me{background:#fff3e0;color:#e65100}.lo{background:#e8f5e9;color:#2e7d32}',
+    '.bar{display:flex;gap:12px;margin:16px 0;flex-wrap:wrap}',
     '.cnt{padding:30px;max-width:700px;margin:0 auto}',
     '.rpt{background:#fafafa;border:1px solid #e0e0e0;border-radius:8px;padding:24px;margin:20px 0}',
     '.ftr{background:#f8f9fa;padding:20px;text-align:center;font-size:13px;color:#666}',
     'h3{color:#1a3c5e;border-bottom:2px solid #e3f2fd;padding-bottom:6px}',
     '</style></head><body>',
-    '<div class="hdr">',
-    '<h1 style="margin:0">Verihome NZ</h1>',
-    '<h2 style="margin:8px 0 0;font-weight:normal;opacity:0.9">' + pkgLabel + ' &mdash; Property Analysis Report</h2>',
-    '</div>',
+    '<div class="hdr"><h1 style="margin:0">Verihome NZ</h1>',
+    '<h2 style="margin:8px 0 0;font-weight:normal;opacity:0.9">' + pkgLabel + ' &mdash; Property Analysis Report</h2></div>',
     '<div class="cnt">',
     '<p>Dear <strong>' + (order.customer_name || 'Valued Customer') + '</strong>,</p>',
     '<p>Your property document analysis is complete. Here is your full report:</p>',
+    '<div class="bar">',
+    '<span class="b" style="background:#e3f2fd;color:#1565c0">1 Document(s)</span>',
+    '<span class="b hi">' + highRisks + ' High Risk</span>',
+    '<span class="b me">' + medRisks + ' Medium Risk</span>',
+    '<span class="b lo">' + lowRisks + ' Low Risk</span>',
+    '<span class="b" style="background:#f5f5f5;color:#424242">Total: ' + total + ' Findings</span>',
+    '</div>',
     order.property_address ? '<p><strong>Property:</strong> ' + order.property_address + '</p>' : '',
     '<div class="rpt">' + order.report_html + '</div>',
     '<div style="background:#fff8e1;padding:16px;border-left:4px solid #ffc107;border-radius:4px;font-size:13px;margin:20px 0">',
@@ -120,3 +131,17 @@ module.exports = async (req, res) => {
     '</body></html>'
   ].join(''));
 };
+
+// --- Risk Count Parser ---------------------------------------------------------
+function parseRiskCountsFromHtml(reportHtml) {
+  let highRisks = 0, medRisks = 0, lowRisks = 0;
+  try {
+    const highSec = reportHtml.match(/HIGH[\s\S]*?(?=MEDIUM RISK|LOW RISK|NEGOTIATION|DUE DILIGENCE|PRE-UNCON|CHECKLIST|$)/i);
+    if (highSec) highRisks = (highSec[0].match(/<li/gi) || []).length;
+    const medSec = reportHtml.match(/MEDIUM RISK[\s\S]*?(?=LOW RISK|NEGOTIATION|DUE DILIGENCE|PRE-UNCON|CHECKLIST|$)/i);
+    if (medSec) medRisks = (medSec[0].match(/<li/gi) || []).length;
+    const lowSec = reportHtml.match(/LOW RISK[\s\S]*?(?=NEGOTIATION|DUE DILIGENCE|PRE-UNCON|CHECKLIST|DISCLAIMER|$)/i);
+    if (lowSec) lowRisks = (lowSec[0].match(/<li/gi) || []).length;
+  } catch(e) { console.warn('parseRiskCountsFromHtml error:', e.message); }
+  return { highRisks, medRisks, lowRisks, total: highRisks + medRisks + lowRisks };
+}
