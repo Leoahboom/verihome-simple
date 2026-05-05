@@ -310,15 +310,14 @@ Format: Formal legal report style. Use <h3> headers with section numbers. Colour
   // Strip markdown code block wrapper if AI returned ```html ... ```
   reportHtml = reportHtml.replace(/^```html[\s\S]*?\n/, '').replace(/\n?```\s*$/, '').trim();
 
-    await sendFullReportEmail(customerEmail, customerName, packageType, record, reportHtml, allFindings);
+    // Save report for admin review
+    await supabase.from('orders').update({ 
+      status: 'report_ready_for_review',
+      report_html: reportHtml
+    }).eq('stripe_session_id', sessionId);
 
-  // Update order status in Supabase
-  await supabase
-      .from('orders')
-      .update({ status: 'report_sent' })
-      .eq('stripe_session_id', sessionId);
-
-  console.log('Report generated and sent to:', customerEmail);
+    await sendReportForReview(customerEmail, customerName, packageType, record, reportHtml, allFindings, sessionId);
+    console.log('Report saved for review, admin notified:', sessionId);Email);
 }
 
 // --- Supabase ------------------------------------------------------------------
@@ -470,6 +469,111 @@ async function sendFullReportEmail(email, name, packageType, record, reportHtml,
 
   if (error) console.error('Resend report email error:', error);
     else console.log('Full report email sent to:', email);
+}
+
+async function sendReportForReview(email, name, packageType, record, reportHtml, allFindings, sessionId) {
+  const pkgLabel = { essential: 'Essential Review', complete: 'Complete Analysis', premium: 'Premium Report' }[packageType] || packageType;
+  const highRisks = allFindings.reduce((sum, f) => sum + f.ruleFindings.filter(r => r.risk === 'HIGH').length, 0);
+  const medRisks  = allFindings.reduce((sum, f) => sum + f.ruleFindings.filter(r => r.risk === 'MEDIUM').length, 0);
+  const lowRisks  = allFindings.reduce((sum, f) => sum + f.ruleFindings.filter(r => r.risk === 'LOW').length, 0);
+  const total     = allFindings.reduce((sum, f) => sum + f.ruleFindings.length, 0);
+
+  const approveUrl = 'https://www.verihome.co.nz/api/send-report?session_id=' + sessionId + '&token=' + process.env.REVIEW_SECRET;
+
+  const adminHtml = [
+    '<!DOCTYPE html><html><head><meta charset="utf-8"><style>',
+    'body{font-family:Arial,sans-serif;line-height:1.6;color:#333;margin:0;padding:0}',
+    '.hdr{background:#1a3c5e;color:white;padding:20px 24px;}',
+    '.cnt{padding:24px;max-width:800px;margin:0 auto}',
+    '.meta{background:#f8f9fa;border-left:4px solid #1a3c5e;padding:16px;border-radius:4px;margin-bottom:20px;font-size:0.9rem;}',
+    '.approve{display:inline-block;background:#27ae60;color:white;padding:14px 36px;border-radius:8px;text-decoration:none;font-weight:700;font-size:1rem;margin:16px 0;}',
+    '.warn{color:#c0392b;font-size:0.82rem;margin-top:4px;}',
+    '.report{background:#fafafa;border:1px solid #e0e0e0;border-radius:8px;padding:20px;margin:20px 0;}',
+    'h3{color:#1a3c5e;border-bottom:2px solid #e3f2fd;padding-bottom:6px}',
+    '.b{display:inline-block;padding:3px 10px;border-radius:12px;font-size:12px;font-weight:700;margin:2px}',
+    '.hi{background:#ffebee;color:#c62828}.me{background:#fff3e0;color:#e65100}.lo{background:#e8f5e9;color:#2e7d32}',
+    '</style></head><body>',
+    '<div class="hdr"><h2 style="margin:0">&#128203; Report Ready for Review</h2>',
+    '<p style="margin:4px 0 0;opacity:0.85;">' + pkgLabel + ' &mdash; Approve to send to client</p></div>',
+    '<div class="cnt">',
+    '<div class="meta">',
+    '<strong>Client:</strong> ' + (name || 'Unknown') + ' (' + email + ')<br>',
+    '<strong>Package:</strong> ' + pkgLabel + '<br>',
+    '<strong>Property:</strong> ' + (record.property_address || 'N/A') + '<br>',
+    '<strong>Amount:</strong> $' + (record.amount / 100).toFixed(2) + ' ' + (record.currency || 'nzd').toUpperCase() + '<br>',
+    '<strong>Risks:</strong> <span class="b hi">' + highRisks + ' High</span> <span class="b me">' + medRisks + ' Medium</span> <span class="b lo">' + lowRisks + ' Low</span> <span class="b" style="background:#f5f5f5;color:#424242">Total: ' + total + '</span>',
+    '</div>',
+    '<a href="' + approveUrl + '" class="approve">&#9989; Approve &amp; Send to Client</a>',
+    '<p class="warn">&#9888; Only click once. This will immediately send the report to ' + email + '</p>',
+    '<h3>Report Preview</h3>',
+    '<div class="report">' + reportHtml + '</div>',
+    '</div></body></html>'
+  ].join('\n');
+
+  const { error } = await resend.emails.send({
+    from: 'Verihome System <support@verihome.co.nz>',
+    to: 'support@verihome.co.nz',
+    subject: '[REVIEW] ' + pkgLabel + ' Report &mdash; ' + (name || email),
+    html: adminHtml,
+  });
+
+  if (error) console.error('Review email error:', error);
+  else console.log('Admin review email sent for session:', sessionId);
+}
+
+async function sendFullReportEmail(email, name, packageType, record, reportHtml, allFindings) {
+  const pkgLabel = { essential: 'Essential Review', complete: 'Complete Analysis', premium: 'Premium Report' }[packageType] || packageType;
+  const highRisks = allFindings.reduce((sum, f) => sum + f.ruleFindings.filter(r => r.risk === 'HIGH').length, 0);
+  const medRisks  = allFindings.reduce((sum, f) => sum + f.ruleFindings.filter(r => r.risk === 'MEDIUM').length, 0);
+  const lowRisks  = allFindings.reduce((sum, f) => sum + f.ruleFindings.filter(r => r.risk === 'LOW').length, 0);
+  const total     = allFindings.reduce((sum, f) => sum + f.ruleFindings.length, 0);
+
+  const clientHtml = [
+    '<!DOCTYPE html><html><head><meta charset="utf-8"><style>',
+    'body{font-family:Arial,sans-serif;line-height:1.6;color:#333;margin:0;padding:0}',
+    '.hdr{background:#1a3c5e;color:white;padding:24px;text-align:center}',
+    '.b{display:inline-block;padding:4px 10px;border-radius:12px;font-size:13px;font-weight:bold;margin:2px}',
+    '.hi{background:#ffebee;color:#c62828}.me{background:#fff3e0;color:#e65100}.lo{background:#e8f5e9;color:#2e7d32}',
+    '.bar{display:flex;gap:12px;margin:16px 0;flex-wrap:wrap}',
+    '.cnt{padding:30px;max-width:700px;margin:0 auto}',
+    '.rpt{background:#fafafa;border:1px solid #e0e0e0;border-radius:8px;padding:24px;margin:20px 0}',
+    '.ftr{background:#f8f9fa;padding:20px;text-align:center;font-size:13px;color:#666}',
+    'h3{color:#1a3c5e;border-bottom:2px solid #e3f2fd;padding-bottom:6px}',
+    '</style></head><body>',
+    '<div class="hdr"><h1 style="margin:0">Verihome NZ</h1>',
+    '<h2 style="margin:8px 0 0;font-weight:normal;opacity:0.9">' + pkgLabel + ' &mdash; Property Analysis Report</h2></div>',
+    '<div class="cnt">',
+    '<p>Dear <strong>' + (name || 'Valued Customer') + '</strong>,</p>',
+    '<p>Your property document analysis is complete. Here is your full report:</p>',
+    '<div class="bar">',
+    '<span class="b" style="background:#e3f2fd;color:#1565c0">' + allFindings.length + ' Document(s)</span>',
+    '<span class="b hi">' + highRisks + ' High Risk</span>',
+    '<span class="b me">' + medRisks + ' Medium Risk</span>',
+    '<span class="b lo">' + lowRisks + ' Low Risk</span>',
+    '<span class="b" style="background:#f5f5f5;color:#424242">Total: ' + total + ' Findings</span>',
+    '</div>',
+    record.property_address ? '<p><strong>Property:</strong> ' + record.property_address + '</p>' : '',
+    '<div class="rpt">' + reportHtml + '</div>',
+    '<div style="background:#fff8e1;padding:16px;border-left:4px solid #ffc107;border-radius:4px;font-size:13px;margin:20px 0">',
+    '<strong>Legal Disclaimer:</strong> This report is generated by an AI-assisted analysis system for informational purposes only. It does not constitute legal advice. Verihome NZ and Protocol Zero Limited recommend consulting a qualified New Zealand solicitor for all significant property transactions.',
+    '</div>',
+    '<p>Questions? Contact us at <a href="mailto:support@verihome.co.nz">support@verihome.co.nz</a></p>',
+    '<p>Best regards,<br><strong>The Verihome NZ Legal Analysis Team</strong></p>',
+    '</div>',
+    '<div class="ftr"><p>Protocol Zero Limited &middot; Verihome NZ &middot; AI-Powered NZ Property Document Analysis<br>',
+    'This email contains confidential analysis prepared for the named recipient only.</p></div>',
+    '</body></html>'
+  ].join('\n');
+
+  const { error } = await resend.emails.send({
+    from: 'Verihome NZ <support@verihome.co.nz>',
+    to: email,
+    subject: 'Your Verihome Property Report is Ready &mdash; ' + pkgLabel,
+    html: clientHtml,
+  });
+
+  if (error) console.error('Report email error:', error);
+  else console.log('Full report sent to client:', email);
 }
 
 async function notifyLegalTeam(record) {
